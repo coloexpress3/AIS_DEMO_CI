@@ -12,7 +12,7 @@ env:
   RES_XML: FT-test-results.xml
   LAUNCHER_EXE: FTToolsLauncher.exe
   LAUNCHER_URL: https://github.com/MicroFocus/ADM-FT-ToolsLauncher/releases/download/v24.2.0/FTToolsLauncher_net48.exe
-  UFT_TEST_PATH: 'C:\Users\Supareak.i\Documents\Functional Testing\DemoGUI'
+  UFT_TEST_PATH: 'C:\Users\Supareak.i\Documents\Functional Testing\AIS_POC'
 
 jobs:
   run-tests:
