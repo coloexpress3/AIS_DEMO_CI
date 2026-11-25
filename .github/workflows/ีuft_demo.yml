@@ -1,0 +1,66 @@
+name: UFT Pipeline
+
+# Pipeline mode: runs the default UFT test on the self-hosted Windows runner
+# and publishes the result to CSDP as a pipeline run. CSDP creates the
+# automated test from this result. (Test Suite mode lives in uft-test.yml.)
+
+on:
+  workflow_dispatch:
+
+env:
+  PROPS_TXT: FT-pipeline-props.txt
+  RES_XML: FT-test-results.xml
+  LAUNCHER_EXE: FTToolsLauncher.exe
+  LAUNCHER_URL: https://github.com/MicroFocus/ADM-FT-ToolsLauncher/releases/download/v24.2.0/FTToolsLauncher_net48.exe
+  UFT_TEST_PATH: 'C:\Users\Supareak.i\Documents\Functional Testing\DemoGUI'
+
+jobs:
+  run-tests:
+    runs-on: [self-hosted, Windows, X64, ft-runner]
+
+    steps:
+      - name: Create UFT properties file
+        shell: powershell
+        run: |
+          if (-not (Test-Path $env:UFT_TEST_PATH)) {
+            Write-Error "UFT test NOT found at $env:UFT_TEST_PATH"
+            exit 1
+          }
+          Remove-Item $env:RES_XML, $env:PROPS_TXT -ErrorAction SilentlyContinue
+          $escapedTarget = $env:UFT_TEST_PATH.Replace('\', '\\')
+          $lines = @(
+            "runType=FileSystem",
+            "resultsFilename=$env:RES_XML",
+            "Test1=$escapedTarget",
+            "resultTestNameOnly=true",
+            "resultUnifiedTestClassname=true"
+          )
+          $lines | Out-File -FilePath $env:PROPS_TXT -Encoding utf8
+          Get-Content $env:PROPS_TXT
+
+      - name: Download Functional Testing launcher
+        shell: powershell
+        run: |
+          if (-not (Test-Path $env:LAUNCHER_EXE)) {
+            Invoke-WebRequest -Uri $env:LAUNCHER_URL -OutFile $env:LAUNCHER_EXE
+          }
+
+      - name: Run UFT test
+        shell: powershell
+        run: |
+          $process = Start-Process -FilePath "$env:LAUNCHER_EXE" `
+            -ArgumentList "-paramfile $env:PROPS_TXT" `
+            -NoNewWindow -PassThru
+          $process | Wait-Process
+          Write-Host "FTToolsLauncher exit code: $($process.ExitCode)"
+          if ($process.ExitCode -ne 0) {
+            exit $process.ExitCode
+          }
+
+      - name: Archive UFT test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: uft-test-results
+          path: FT-test-results.xml
+        continue-on-error: true
