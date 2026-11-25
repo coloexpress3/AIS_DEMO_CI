@@ -1,0 +1,30 @@
+name: CSDP Demo Pipeline
+
+on:
+   workflow_dispatch:
+   
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Build application
+        run: |
+           echo "Starting CSDP customer demo..."
+           echo "Building application..."
+           sleep 3
+           echo "Build successful!"
+        
+      - name: Run automated tests
+        run: |
+           echo "Running automated tests..."
+           sleep 3
+           echo "All tests passed!"
+        
+      - name: Deploy application
+        run: |
+           echo "Deploying application..."
+           sleep 3
+           echo "Deployment successful!"
