@@ -16,7 +16,7 @@ env:
 
 jobs:
   run-tests:
-    runs-on: [self-hosted, Windows, X64, ft-runner]
+    runs-on: [self-hosted, Windows, X64]
 
     steps:
       - name: Create UFT properties file
