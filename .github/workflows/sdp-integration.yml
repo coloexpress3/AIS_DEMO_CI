@@ -2,7 +2,7 @@ name: OpenText Software Delivery Platform Integration
 
 on:
   workflow_run:
-    workflows: ["CSDP Demo Pipeline", "UFT AOS Test"]
+    workflows: ["CSDP Demo Pipeline", "UFT Pipeline"]
     types: [requested, in_progress, completed]
 
 permissions:
